@@ -1,5 +1,4 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
@@ -7,9 +6,8 @@ import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import { authStorage } from "./replit_integrations/auth/storage";
 
 export async function registerRoutes(
-  httpServer: Server,
   app: Express
-): Promise<Server> {
+): Promise<void> {
   
   // Setup Auth First
   await setupAuth(app);
@@ -94,7 +92,7 @@ export async function registerRoutes(
   // Seed Data
   await seedDatabase();
 
-  return httpServer;
+  return;
 }
 
 async function seedDatabase() {
