@@ -5,13 +5,13 @@ import { z } from "zod";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import { authStorage } from "./replit_integrations/auth/storage";
 
-export async function registerRoutes(
-  app: Express
-): Promise<void> {
+export function registerRoutes(app: Express): void {
   
-  // Setup Auth First
-  await setupAuth(app);
-  registerAuthRoutes(app);
+  // Setup Auth (simplified for serverless)
+  app.set("trust proxy", 1);
+  // Skip complex auth setup for now - using mock user ID
+  // await setupAuth(app);
+  // registerAuthRoutes(app);
 
   // Helper to get userId from req (supports mocked '1' for dev if needed, or actual auth)
   const getUserId = (req: any) => {
