@@ -18,9 +18,13 @@ export default function Dashboard() {
   const allLogsLoaded = logsQueries.every(query => !query.isLoading);
 
   let activeStreak = 0;
-  if (allLogsLoaded && habits) {
+  let completionRate = 0;
+
+  if (allLogsLoaded && habits && habits.length > 0) {
     const allLogs = logsQueries.flatMap(query => query.data || []);
     const completedDates = new Set(allLogs.filter(log => log.completed).map(log => log.date));
+    
+    // Calculate active streak
     let streak = 0;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -35,6 +39,32 @@ export default function Dashboard() {
       }
     }
     activeStreak = streak;
+
+    // Calculate completion rate (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    let totalPossible = 0;
+    let totalCompleted = 0;
+    
+    for (let i = 0; i < 30; i++) {
+      const checkDate = new Date(thirtyDaysAgo);
+      checkDate.setDate(thirtyDaysAgo.getDate() + i);
+      const dateStr = checkDate.toISOString().split('T')[0];
+      
+      // For each habit, check if it was completed on this date
+      habits.forEach(habit => {
+        const habitLog = allLogs.find(log => 
+          log.habitId === habit.id && log.date === dateStr
+        );
+        totalPossible++;
+        if (habitLog?.completed) {
+          totalCompleted++;
+        }
+      });
+    }
+    
+    completionRate = totalPossible > 0 ? Math.round((totalCompleted / totalPossible) * 100) : 0;
   }
 
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
@@ -93,7 +123,7 @@ export default function Dashboard() {
           <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-lg shadow-black/5 hover:border-primary/20 transition-colors">
              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Completion Rate</h3>
             <div className="mt-2 text-3xl font-display font-bold text-emerald-500">
-              84%
+              {allLogsLoaded ? `${completionRate}%` : <Skeleton className="h-9 w-12" />}
             </div>
           </div>
         </div>
