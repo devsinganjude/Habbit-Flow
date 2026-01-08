@@ -8,15 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 // HABIT HOOKS
 // ============================================
 
-export function useHabitLogs(habitId: string, month?: string) {
+export function useHabits(userId: string) {
   return useQuery({
-    queryKey: [api.habits.logs.list.path, habitId, month],
+    queryKey: [api.habits.list.path, userId],
     queryFn: async () => {
-      const params = month ? { month } : {};
-      const url = `${buildUrl(api.habits.logs.list.path, { id: habitId })}?${new URLSearchParams(params)}`;
+      const url = `${api.habits.list.path}?userId=${userId}`;
       const res = await fetch(url, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch habit logs");
-      return api.habits.logs.list.responses[200].parse(await res.json());
+      if (!res.ok) throw new Error("Failed to fetch habits");
+      return api.habits.list.responses[200].parse(await res.json());
     },
   });
 }
@@ -88,7 +87,7 @@ export function useDeleteHabit() {
 // HABIT LOG HOOKS
 // ============================================
 
-export function useHabitLogs(habitId: number, monthStr?: string) {
+export function useHabitLogs(habitId: string, monthStr?: string) {
   return useQuery({
     queryKey: [api.habits.logs.list.path, habitId, monthStr],
     queryFn: async () => {

@@ -89,8 +89,8 @@ export function registerRoutes(app: Express): void {
     }
   });
 
-  // Seed Data
-  await seedDatabase();
+  // Seed Data (removed for serverless compatibility)
+  // await seedDatabase();
 
   return;
 }

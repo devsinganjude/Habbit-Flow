@@ -87,7 +87,7 @@ export function HabitGrid({ habits, currentDate }: HabitGridProps) {
 
 function HabitRow({ habit, days }: { habit: Habit, days: Date[] }) {
   const monthStr = format(days[0], "yyyy-MM");
-  const { data: logs, isLoading } = useHabitLogs(habit.id, monthStr);
+  const { data: logs, isLoading } = useHabitLogs(habit.id.toString(), monthStr);
   const updateLog = useUpdateHabitLog();
   const deleteHabit = useDeleteHabit();
 
