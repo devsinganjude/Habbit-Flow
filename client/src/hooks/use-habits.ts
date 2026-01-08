@@ -8,14 +8,15 @@ import { useToast } from "@/hooks/use-toast";
 // HABIT HOOKS
 // ============================================
 
-export function useHabits(userId: number) {
+export function useHabitLogs(habitId: string, month?: string) {
   return useQuery({
-    queryKey: [api.habits.list.path, userId],
+    queryKey: [api.habits.logs.list.path, habitId, month],
     queryFn: async () => {
-      const url = `${api.habits.list.path}?userId=${userId}`;
+      const params = month ? { month } : {};
+      const url = `${buildUrl(api.habits.logs.list.path, { id: habitId })}?${new URLSearchParams(params)}`;
       const res = await fetch(url, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch habits");
-      return api.habits.list.responses[200].parse(await res.json());
+      if (!res.ok) throw new Error("Failed to fetch habit logs");
+      return api.habits.logs.list.responses[200].parse(await res.json());
     },
   });
 }

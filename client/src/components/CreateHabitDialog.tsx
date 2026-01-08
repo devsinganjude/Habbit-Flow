@@ -39,7 +39,7 @@ const COLORS = [
   { label: "Violet", value: "#8b5cf6" },
 ];
 
-export function CreateHabitDialog({ userId }: { userId: number }) {
+export function CreateHabitDialog({ userId }: { userId: string }) {
   const [open, setOpen] = useState(false);
   const createHabit = useCreateHabit();
 
@@ -123,8 +123,10 @@ export function CreateHabitDialog({ userId }: { userId: number }) {
                     <FormControl>
                       <Input 
                         type="number" 
-                        {...field}
-                        onChange={e => field.onChange(parseInt(e.target.value))}
+                        value={field.value ?? ""}
+                        onChange={e => field.onChange(e.target.value === "" ? undefined : parseInt(e.target.value))}
+                        onBlur={field.onBlur}
+                        name={field.name}
                         className="bg-background" 
                       />
                     </FormControl>

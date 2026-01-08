@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { HabitGrid } from "@/components/HabitGrid";
 import { CreateHabitDialog } from "@/components/CreateHabitDialog";
-import { useHabits } from "@/hooks/use-habits";
+import { useHabits, useHabitLogs } from "@/hooks/use-habits";
 import { format, subMonths, addMonths } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
@@ -11,8 +11,31 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function Dashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
   // Mock userId for now, as per implementation notes
-  const userId = 1;
+  const userId = "1";
   const { data: habits, isLoading } = useHabits(userId);
+
+  const logsQueries = habits?.map(habit => useHabitLogs(habit.id.toString())) || [];
+  const allLogsLoaded = logsQueries.every(query => !query.isLoading);
+
+  let activeStreak = 0;
+  if (allLogsLoaded && habits) {
+    const allLogs = logsQueries.flatMap(query => query.data || []);
+    const completedDates = new Set(allLogs.filter(log => log.completed).map(log => log.date));
+    let streak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let i = 0; ; i++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(today.getDate() - i);
+      const dateStr = checkDate.toISOString().split('T')[0];
+      if (completedDates.has(dateStr)) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    activeStreak = streak;
+  }
 
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
@@ -64,8 +87,7 @@ export default function Dashboard() {
           <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-lg shadow-black/5 hover:border-primary/20 transition-colors">
              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Active Streak</h3>
             <div className="mt-2 text-3xl font-display font-bold">
-              {/* Mock data for now */}
-              12 Days
+              {allLogsLoaded ? `${activeStreak} Days` : <Skeleton className="h-9 w-12" />}
             </div>
           </div>
           <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-lg shadow-black/5 hover:border-primary/20 transition-colors">

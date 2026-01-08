@@ -14,7 +14,7 @@ import {
 import { format, subDays } from "date-fns";
 
 export default function Analytics() {
-  const userId = 1; // Mock user
+  const userId = "1"; // Mock user
   const { data: habits } = useHabits(userId);
 
   // Mock data for charts since we don't have a complex analytics endpoint yet
